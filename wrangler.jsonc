@@ -1,6 +1,5 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  // wrangler.jsonc
   "name": "hacker-news",
   "compatibility_date": "2025-09-02",
   "compatibility_flags": ["nodejs_compat"],
@@ -9,6 +8,9 @@
     "logs": {
       "enabled": true,
       "invocation_logs": true,
+    },
+    "traces": {
+      "enabled": true,
     },
   },
 }
