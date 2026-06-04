@@ -13,6 +13,14 @@ export function faviconUrl(url?: string): string {
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`
 }
 
+/** True when the user has requested reduced motion (client-only). */
+export function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+}
+
 /** Human-friendly relative time from a Unix-seconds timestamp. */
 export function timeAgo(unixSeconds: number): string {
   const seconds = Math.max(0, Date.now() / 1000 - unixSeconds)

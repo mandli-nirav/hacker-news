@@ -4,6 +4,7 @@ import { ArrowBigUp, ArrowLeft, MessageSquare } from 'lucide-react'
 import { itemQueryOptions } from '#/lib/hn'
 import { hostname, timeAgo } from '#/lib/format'
 import { Comment } from '#/components/comment'
+import { SafeHtml } from '#/components/safe-html'
 
 export const Route = createFileRoute('/story/$id')({
   component: StoryDetail,
@@ -80,14 +81,13 @@ function StoryDetail() {
             {story.score ?? 0}
           </span>
           {story.by && (
-            <a
-              href={`https://news.ycombinator.com/user?id=${story.by}`}
-              target="_blank"
-              rel="noreferrer"
+            <Link
+              to="/user/$id"
+              params={{ id: story.by }}
               className="hover:text-foreground hover:underline"
             >
               by {story.by}
-            </a>
+            </Link>
           )}
           {story.time && <span>{timeAgo(story.time)}</span>}
           <span className="inline-flex items-center gap-0.5">
@@ -97,9 +97,9 @@ function StoryDetail() {
         </div>
 
         {story.text && (
-          <div
+          <SafeHtml
+            html={story.text}
             className="mt-4 text-sm leading-relaxed wrap-break-word [&_a]:text-primary [&_a]:underline [&_p]:my-2"
-            dangerouslySetInnerHTML={{ __html: story.text }}
           />
         )}
       </article>

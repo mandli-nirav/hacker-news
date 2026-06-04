@@ -61,8 +61,8 @@ async function fetchItem(id: number): Promise<Item | null> {
   return data
 }
 
-async function fetchUser(id: string): Promise<User> {
-  const { data } = await hnClient.get<User>(`/user/${id}.json`)
+async function fetchUser(id: string): Promise<User | null> {
+  const { data } = await hnClient.get<User | null>(`/user/${id}.json`)
   return data
 }
 

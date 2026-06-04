@@ -10,7 +10,12 @@ import {
   MessageSquare,
 } from 'lucide-react'
 import { itemQueryOptions } from '#/lib/hn'
-import { faviconUrl, hostname, timeAgo } from '#/lib/format'
+import {
+  faviconUrl,
+  hostname,
+  prefersReducedMotion,
+  timeAgo,
+} from '#/lib/format'
 import { Comment } from './comment'
 
 export function StoryRow({ id, rank }: { id: number; rank: number }) {
@@ -18,9 +23,11 @@ export function StoryRow({ id, rank }: { id: number; rank: number }) {
   const [showComments, setShowComments] = useState(false)
   const rowRef = useRef<HTMLLIElement>(null)
 
+  const visible = Boolean(story) && !story?.deleted && !story?.dead
+
   useGSAP(
     () => {
-      if (!story) return
+      if (!visible || prefersReducedMotion()) return
       gsap.from('[data-story-content]', {
         opacity: 0,
         y: 8,
@@ -28,12 +35,12 @@ export function StoryRow({ id, rank }: { id: number; rank: number }) {
         ease: 'power2.out',
       })
     },
-    { dependencies: [Boolean(story)], scope: rowRef },
+    { dependencies: [visible], scope: rowRef },
   )
 
   useGSAP(
     () => {
-      if (!showComments) return
+      if (!showComments || prefersReducedMotion()) return
       gsap.from('[data-comments]', {
         opacity: 0,
         y: -4,
@@ -44,9 +51,14 @@ export function StoryRow({ id, rank }: { id: number; rank: number }) {
     { dependencies: [showComments], scope: rowRef },
   )
 
+  // Keep the <li> (and its ref) mounted in every state so the GSAP scope is
+  // always valid; only the inner content changes.
   if (isPending) {
     return (
-      <li className="flex gap-3 rounded-md px-2 py-2.5">
+      <li
+        ref={rowRef}
+        className="flex gap-3 rounded-md px-2 py-2.5"
+      >
         <span className="w-6 shrink-0 text-right text-sm text-muted-foreground">
           {rank}.
         </span>
@@ -55,7 +67,7 @@ export function StoryRow({ id, rank }: { id: number; rank: number }) {
     )
   }
 
-  if (!story || story.deleted || story.dead) return null
+  if (!story || !visible) return <li ref={rowRef} className="hidden" />
 
   const target =
     story.url ?? `https://news.ycombinator.com/item?id=${story.id}`
@@ -100,14 +112,13 @@ export function StoryRow({ id, rank }: { id: number; rank: number }) {
               {story.score ?? 0}
             </span>
             {story.by && (
-              <a
-                href={`https://news.ycombinator.com/user?id=${story.by}`}
-                target="_blank"
-                rel="noreferrer"
+              <Link
+                to="/user/$id"
+                params={{ id: story.by }}
                 className="hover:text-foreground hover:underline"
               >
                 by {story.by}
-              </a>
+              </Link>
             )}
             {story.time && <span>{timeAgo(story.time)}</span>}
             <button

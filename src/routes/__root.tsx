@@ -81,6 +81,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <script
           // Set the theme class before paint to avoid a flash of the wrong theme.
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: themeInitScript }}
         />
         <HeadContent />
