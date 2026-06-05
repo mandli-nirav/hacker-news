@@ -87,4 +87,7 @@ export const storyListQueryOptions = (list: StoryList) =>
   queryOptions({
     queryKey: ['hn', 'list', list],
     queryFn: () => fetchStoryIds(list),
+    // Keep the feed live: silently refetch in the background and on focus.
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
   })

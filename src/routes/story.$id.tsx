@@ -5,13 +5,18 @@ import { itemQueryOptions } from '#/lib/hn'
 import { hostname, timeAgo } from '#/lib/format'
 import { Comment } from '#/components/comment'
 import { SafeHtml } from '#/components/safe-html'
+import { PollOptions } from '#/components/poll-options'
+import { NotFound } from '#/components/route-states'
 
 export const Route = createFileRoute('/story/$id')({
   component: StoryDetail,
-  loader: ({ context, params }) => {
+  notFoundComponent: () => <NotFound message="That story doesn't exist." />,
+  loader: async ({ context, params }) => {
     const id = Number(params.id)
     if (!Number.isInteger(id)) throw notFound()
-    return context.queryClient.ensureQueryData(itemQueryOptions(id))
+    const item = await context.queryClient.ensureQueryData(itemQueryOptions(id))
+    if (!item) throw notFound()
+    return item
   },
   head: ({ loaderData }) => {
     const title = loaderData?.title ?? 'Story'
@@ -101,6 +106,10 @@ function StoryDetail() {
             html={story.text}
             className="mt-4 text-sm leading-relaxed wrap-break-word [&_a]:text-primary [&_a]:underline [&_p]:my-2"
           />
+        )}
+
+        {story.parts && story.parts.length > 0 && (
+          <PollOptions partIds={story.parts} />
         )}
       </article>
 

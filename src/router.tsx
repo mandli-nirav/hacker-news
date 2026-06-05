@@ -2,6 +2,11 @@ import { createRouter as createTanStackRouter } from '@tanstack/react-router'
 import { QueryClient } from '@tanstack/react-query'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 import { routeTree } from './routeTree.gen'
+import {
+  ErrorState,
+  NotFound,
+  PendingSkeleton,
+} from './components/route-states'
 
 export function getRouter() {
   const queryClient = new QueryClient({
@@ -18,6 +23,9 @@ export function getRouter() {
     defaultPreload: 'intent',
     defaultPreloadStaleTime: 0,
     context: { queryClient },
+    defaultErrorComponent: ErrorState,
+    defaultNotFoundComponent: () => <NotFound />,
+    defaultPendingComponent: PendingSkeleton,
   })
 
   setupRouterSsrQueryIntegration({ router, queryClient })

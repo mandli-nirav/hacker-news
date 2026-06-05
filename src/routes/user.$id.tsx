@@ -1,16 +1,23 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute, notFound } from '@tanstack/react-router'
 import { useSuspenseQuery, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { itemQueryOptions, userQueryOptions } from '#/lib/hn'
 import { timeAgo } from '#/lib/format'
 import { SafeHtml } from '#/components/safe-html'
+import { NotFound } from '#/components/route-states'
 
 const SUBMISSION_PAGE = 30
 
 export const Route = createFileRoute('/user/$id')({
   component: UserProfile,
-  loader: ({ context, params }) =>
-    context.queryClient.ensureQueryData(userQueryOptions(params.id)),
+  notFoundComponent: () => <NotFound message="That user doesn't exist." />,
+  loader: async ({ context, params }) => {
+    const user = await context.queryClient.ensureQueryData(
+      userQueryOptions(params.id),
+    )
+    if (!user) throw notFound()
+    return user
+  },
   head: ({ params }) => ({
     meta: [
       { title: `${params.id} | Hacker News` },

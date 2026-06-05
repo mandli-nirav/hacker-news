@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
@@ -21,7 +21,19 @@ import { Comment } from './comment'
 export function StoryRow({ id, rank }: { id: number; rank: number }) {
   const { data: story, isPending } = useQuery(itemQueryOptions(id))
   const [showComments, setShowComments] = useState(false)
+  const [voted, setVoted] = useState(false)
   const rowRef = useRef<HTMLLIElement>(null)
+  const queryClient = useQueryClient()
+
+  // Optimistic, client-only upvote: bumps the cached score instantly. The HN
+  // API is read-only, so this does not persist and resets on the next refetch.
+  function upvote() {
+    if (voted) return
+    setVoted(true)
+    queryClient.setQueryData(itemQueryOptions(id).queryKey, (old) =>
+      old ? { ...old, score: (old.score ?? 0) + 1 } : old,
+    )
+  }
 
   const visible = Boolean(story) && !story?.deleted && !story?.dead
 
@@ -107,10 +119,19 @@ export function StoryRow({ id, rank }: { id: number; rank: number }) {
             </div>
           </div>
           <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-0.5 font-medium text-primary">
-              <ArrowBigUp className="size-3.5 fill-primary" />
+            <button
+              type="button"
+              onClick={upvote}
+              disabled={voted}
+              aria-label="Upvote"
+              aria-pressed={voted}
+              className="inline-flex items-center gap-0.5 font-medium text-primary transition-transform hover:scale-105 disabled:hover:scale-100"
+            >
+              <ArrowBigUp
+                className={`size-3.5 ${voted ? 'fill-primary' : ''}`}
+              />
               {story.score ?? 0}
-            </span>
+            </button>
             {story.by && (
               <Link
                 to="/user/$id"
