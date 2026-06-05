@@ -91,3 +91,53 @@ export const storyListQueryOptions = (list: StoryList) =>
     refetchInterval: 30_000,
     refetchOnWindowFocus: true,
   })
+
+/** Recently changed item ids and usernames (the API's live-data endpoint). */
+export interface Updates {
+  items: Array<number>
+  profiles: Array<string>
+}
+
+async function fetchUpdates(): Promise<Updates> {
+  const { data } = await hnClient.get<Updates>('/updates.json')
+  return data
+}
+
+export const updatesQueryOptions = () =>
+  queryOptions({
+    queryKey: ['hn', 'updates'],
+    queryFn: fetchUpdates,
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
+  })
+
+async function fetchMaxItem(): Promise<number> {
+  const { data } = await hnClient.get<number>('/maxitem.json')
+  return data
+}
+
+export const maxItemQueryOptions = () =>
+  queryOptions({
+    queryKey: ['hn', 'maxitem'],
+    queryFn: fetchMaxItem,
+    refetchInterval: 15_000,
+    refetchOnWindowFocus: true,
+  })
+
+/** Walk a comment's `parent` chain up to its root story/job/poll. */
+async function fetchRootStory(itemId: number): Promise<Item | null> {
+  let current = await fetchItem(itemId)
+  let guard = 0
+  while (current?.parent && guard < 20) {
+    current = await fetchItem(current.parent)
+    guard++
+  }
+  return current
+}
+
+export const rootStoryQueryOptions = (itemId: number) =>
+  queryOptions({
+    queryKey: ['hn', 'root', itemId],
+    queryFn: () => fetchRootStory(itemId),
+    staleTime: Infinity, // a comment's ancestry never changes
+  })

@@ -146,3 +146,12 @@ body {
     @apply font-sans;
   }
 }
+
+/* Horizontally scrollable strips (e.g. the mobile feed tabs) without a visible scrollbar. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

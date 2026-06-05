@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as LiveRouteImport } from './routes/live'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UserIdRouteImport } from './routes/user.$id'
 import { Route as StoryIdRouteImport } from './routes/story.$id'
@@ -17,6 +18,11 @@ import { Route as StoryIdRouteImport } from './routes/story.$id'
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveRoute = LiveRouteImport.update({
+  id: '/live',
+  path: '/live',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,12 +43,14 @@ const StoryIdRoute = StoryIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/live': typeof LiveRoute
   '/search': typeof SearchRoute
   '/story/$id': typeof StoryIdRoute
   '/user/$id': typeof UserIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/live': typeof LiveRoute
   '/search': typeof SearchRoute
   '/story/$id': typeof StoryIdRoute
   '/user/$id': typeof UserIdRoute
@@ -50,20 +58,22 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/live': typeof LiveRoute
   '/search': typeof SearchRoute
   '/story/$id': typeof StoryIdRoute
   '/user/$id': typeof UserIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/search' | '/story/$id' | '/user/$id'
+  fullPaths: '/' | '/live' | '/search' | '/story/$id' | '/user/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/search' | '/story/$id' | '/user/$id'
-  id: '__root__' | '/' | '/search' | '/story/$id' | '/user/$id'
+  to: '/' | '/live' | '/search' | '/story/$id' | '/user/$id'
+  id: '__root__' | '/' | '/live' | '/search' | '/story/$id' | '/user/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LiveRoute: typeof LiveRoute
   SearchRoute: typeof SearchRoute
   StoryIdRoute: typeof StoryIdRoute
   UserIdRoute: typeof UserIdRoute
@@ -76,6 +86,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live': {
+      id: '/live'
+      path: '/live'
+      fullPath: '/live'
+      preLoaderRoute: typeof LiveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -104,6 +121,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LiveRoute: LiveRoute,
   SearchRoute: SearchRoute,
   StoryIdRoute: StoryIdRoute,
   UserIdRoute: UserIdRoute,

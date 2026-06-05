@@ -9,6 +9,7 @@ import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import type { QueryClient } from '@tanstack/react-query'
 
 import { Header } from '#/components/header'
+import { LiveUpdates } from '#/components/live-updates'
 import { themeInitScript } from '#/components/theme-toggle'
 import appCss from '../styles.css?url'
 
@@ -87,6 +88,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
+        <LiveUpdates />
         <Header />
         {children}
         <TanStackDevtools

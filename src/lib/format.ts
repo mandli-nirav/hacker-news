@@ -13,6 +13,20 @@ export function faviconUrl(url?: string): string {
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`
 }
 
+/** Strip HTML tags and decode common entities to a plain-text snippet. */
+export function stripHtml(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#x27;/g, "'")
+    .replace(/&#x2F;/g, '/')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 /** True when the user has requested reduced motion (client-only). */
 export function prefersReducedMotion(): boolean {
   return (

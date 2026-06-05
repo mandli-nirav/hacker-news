@@ -87,7 +87,7 @@ export function StoryRow({ id }: { id: number }) {
               )}
             </div>
           </div>
-          <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
             <UpvoteButton id={story.id} score={story.score ?? 0} />
             {story.by && (
               <Link

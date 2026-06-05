@@ -2,8 +2,10 @@ import { Link, createFileRoute, notFound } from '@tanstack/react-router'
 import { useSuspenseQuery, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { itemQueryOptions, userQueryOptions } from '#/lib/hn'
+import { stripHtml } from '#/lib/format'
 import { SafeHtml } from '#/components/safe-html'
 import { RelativeTime } from '#/components/relative-time'
+import { CommentContext } from '#/components/comment-context'
 import { NotFound } from '#/components/route-states'
 
 const SUBMISSION_PAGE = 30
@@ -122,22 +124,20 @@ function SubmissionRow({ id }: { id: number }) {
     )
   }
 
-  // Comment: link to its thread on HN.
+  // Comment: link to its root story internally, with a text snippet.
   return (
-    <li className="text-sm text-muted-foreground">
-      <a
-        href={`https://news.ycombinator.com/item?id=${item.id}`}
-        target="_blank"
-        rel="noreferrer"
-        className="hover:text-foreground hover:underline"
-      >
-        comment{' '}
+    <li className="text-sm">
+      <p className="line-clamp-2 text-muted-foreground wrap-break-word">
+        {stripHtml(item.text ?? '')}
+      </p>
+      <div className="text-xs text-muted-foreground">
+        <CommentContext commentId={item.id} />
         {item.time ? (
-          <>
-            · <RelativeTime seconds={item.time} />
-          </>
+          <span className="ml-2">
+            <RelativeTime seconds={item.time} />
+          </span>
         ) : null}
-      </a>
+      </div>
     </li>
   )
 }
