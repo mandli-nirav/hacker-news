@@ -112,8 +112,8 @@ function Home() {
       )}
 
       <ol className="space-y-1">
-        {visibleIds.map((id, index) => (
-          <StoryRow key={id} id={id} rank={index + 1} />
+        {visibleIds.map((id) => (
+          <StoryRow key={id} id={id} />
         ))}
       </ol>
 

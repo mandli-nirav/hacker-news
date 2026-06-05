@@ -4,8 +4,9 @@ import { useRef, useState } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { itemQueryOptions } from '#/lib/hn'
-import { prefersReducedMotion, timeAgo } from '#/lib/format'
+import { prefersReducedMotion } from '#/lib/format'
 import { SafeHtml } from './safe-html'
+import { RelativeTime } from './relative-time'
 
 export function Comment({ id }: { id: number }) {
   const { data: comment, isPending } = useQuery(itemQueryOptions(id))
@@ -59,7 +60,7 @@ export function Comment({ id }: { id: number }) {
             {comment.by}
           </Link>
         )}
-        {comment.time && <span>{timeAgo(comment.time)}</span>}
+        {comment.time && <RelativeTime seconds={comment.time} />}
       </div>
 
       {!collapsed && (

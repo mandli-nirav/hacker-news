@@ -1,39 +1,20 @@
 import { Link } from '@tanstack/react-router'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
-import {
-  ArrowBigUp,
-  ChevronDown,
-  ChevronRight,
-  MessageSquare,
-} from 'lucide-react'
+import { ChevronDown, ChevronRight, MessageSquare } from 'lucide-react'
 import { itemQueryOptions } from '#/lib/hn'
-import {
-  faviconUrl,
-  hostname,
-  prefersReducedMotion,
-  timeAgo,
-} from '#/lib/format'
+import { hostname, prefersReducedMotion } from '#/lib/format'
 import { Comment } from './comment'
+import { UpvoteButton } from './upvote-button'
+import { RelativeTime } from './relative-time'
+import { Favicon } from './favicon'
 
-export function StoryRow({ id, rank }: { id: number; rank: number }) {
+export function StoryRow({ id }: { id: number }) {
   const { data: story, isPending } = useQuery(itemQueryOptions(id))
   const [showComments, setShowComments] = useState(false)
-  const [voted, setVoted] = useState(false)
   const rowRef = useRef<HTMLLIElement>(null)
-  const queryClient = useQueryClient()
-
-  // Optimistic, client-only upvote: bumps the cached score instantly. The HN
-  // API is read-only, so this does not persist and resets on the next refetch.
-  function upvote() {
-    if (voted) return
-    setVoted(true)
-    queryClient.setQueryData(itemQueryOptions(id).queryKey, (old) =>
-      old ? { ...old, score: (old.score ?? 0) + 1 } : old,
-    )
-  }
 
   const visible = Boolean(story) && !story?.deleted && !story?.dead
 
@@ -67,13 +48,7 @@ export function StoryRow({ id, rank }: { id: number; rank: number }) {
   // always valid; only the inner content changes.
   if (isPending) {
     return (
-      <li
-        ref={rowRef}
-        className="flex gap-3 rounded-md px-2 py-2.5"
-      >
-        <span className="w-6 shrink-0 text-right text-sm text-muted-foreground">
-          {rank}.
-        </span>
+      <li ref={rowRef} className="rounded-md px-2 py-2.5">
         <div className="h-9 w-full animate-pulse rounded bg-muted" />
       </li>
     )
@@ -91,17 +66,11 @@ export function StoryRow({ id, rank }: { id: number; rank: number }) {
       ref={rowRef}
       className="rounded-md px-2 py-2.5 transition-colors hover:bg-muted/40"
     >
-      <div data-story-content className="flex gap-3">
-        <span className="w-6 shrink-0 pt-0.5 text-right text-sm text-muted-foreground">
-          {rank}.
-        </span>
-        <div className="min-w-0">
+      <div data-story-content className="min-w-0">
+        <div>
           <div className="flex items-start gap-2">
-            <img
-              src={faviconUrl(story.url)}
-              alt=""
-              aria-hidden
-              loading="lazy"
+            <Favicon
+              url={story.url}
               className="mt-0.5 size-4 shrink-0 rounded-sm"
             />
             <div className="flex flex-wrap items-baseline gap-x-2">
@@ -119,19 +88,7 @@ export function StoryRow({ id, rank }: { id: number; rank: number }) {
             </div>
           </div>
           <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
-            <button
-              type="button"
-              onClick={upvote}
-              disabled={voted}
-              aria-label="Upvote"
-              aria-pressed={voted}
-              className="inline-flex items-center gap-0.5 font-medium text-primary transition-transform hover:scale-105 disabled:hover:scale-100"
-            >
-              <ArrowBigUp
-                className={`size-3.5 ${voted ? 'fill-primary' : ''}`}
-              />
-              {story.score ?? 0}
-            </button>
+            <UpvoteButton id={story.id} score={story.score ?? 0} />
             {story.by && (
               <Link
                 to="/user/$id"
@@ -141,7 +98,7 @@ export function StoryRow({ id, rank }: { id: number; rank: number }) {
                 by {story.by}
               </Link>
             )}
-            {story.time && <span>{timeAgo(story.time)}</span>}
+            {story.time && <RelativeTime seconds={story.time} />}
             <button
               type="button"
               onClick={() => setShowComments((v) => !v)}
@@ -168,7 +125,7 @@ export function StoryRow({ id, rank }: { id: number; rank: number }) {
       </div>
 
       {showComments && (
-        <div data-comments className="mt-3 ml-9">
+        <div data-comments className="mt-3 ml-6">
           {story.kids?.length ? (
             <ul className="space-y-3">
               {story.kids.map((kid) => (

@@ -2,8 +2,8 @@ import { Link, createFileRoute, notFound } from '@tanstack/react-router'
 import { useSuspenseQuery, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { itemQueryOptions, userQueryOptions } from '#/lib/hn'
-import { timeAgo } from '#/lib/format'
 import { SafeHtml } from '#/components/safe-html'
+import { RelativeTime } from '#/components/relative-time'
 import { NotFound } from '#/components/route-states'
 
 const SUBMISSION_PAGE = 30
@@ -54,7 +54,9 @@ function UserProfile() {
           <span>
             <span className="font-medium text-primary">{user.karma}</span> karma
           </span>
-          <span>joined {timeAgo(user.created)}</span>
+          <span>
+            joined <RelativeTime seconds={user.created} />
+          </span>
           <span>{submitted.length} submissions</span>
         </div>
         {user.about && (
@@ -112,8 +114,9 @@ function SubmissionRow({ id }: { id: number }) {
           {item.title}
         </Link>
         <span className="ml-2 text-xs text-muted-foreground">
-          {item.score ?? 0} points · {item.descendants ?? 0} comments ·{' '}
-          {item.time ? timeAgo(item.time) : ''}
+          {item.score ?? 0} points · {item.descendants ?? 0} comments
+          {item.time ? ' · ' : ''}
+          {item.time ? <RelativeTime seconds={item.time} /> : null}
         </span>
       </li>
     )
@@ -128,7 +131,12 @@ function SubmissionRow({ id }: { id: number }) {
         rel="noreferrer"
         className="hover:text-foreground hover:underline"
       >
-        comment {item.time ? `· ${timeAgo(item.time)}` : ''}
+        comment{' '}
+        {item.time ? (
+          <>
+            · <RelativeTime seconds={item.time} />
+          </>
+        ) : null}
       </a>
     </li>
   )

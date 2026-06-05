@@ -1,11 +1,13 @@
 import { Link, createFileRoute, notFound } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { ArrowBigUp, ArrowLeft, MessageSquare } from 'lucide-react'
+import { ArrowLeft, MessageSquare } from 'lucide-react'
 import { itemQueryOptions } from '#/lib/hn'
-import { hostname, timeAgo } from '#/lib/format'
+import { hostname } from '#/lib/format'
 import { Comment } from '#/components/comment'
 import { SafeHtml } from '#/components/safe-html'
 import { PollOptions } from '#/components/poll-options'
+import { UpvoteButton } from '#/components/upvote-button'
+import { RelativeTime } from '#/components/relative-time'
 import { NotFound } from '#/components/route-states'
 
 export const Route = createFileRoute('/story/$id')({
@@ -81,10 +83,7 @@ function StoryDetail() {
         </h1>
 
         <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-          <span className="inline-flex items-center gap-0.5 font-medium text-primary">
-            <ArrowBigUp className="size-3.5 fill-primary" />
-            {story.score ?? 0}
-          </span>
+          <UpvoteButton id={story.id} score={story.score ?? 0} />
           {story.by && (
             <Link
               to="/user/$id"
@@ -94,7 +93,7 @@ function StoryDetail() {
               by {story.by}
             </Link>
           )}
-          {story.time && <span>{timeAgo(story.time)}</span>}
+          {story.time && <RelativeTime seconds={story.time} />}
           <span className="inline-flex items-center gap-0.5">
             <MessageSquare className="size-3.5" />
             {story.descendants ?? 0}

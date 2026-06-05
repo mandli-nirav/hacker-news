@@ -37,8 +37,8 @@ function Search() {
       )}
 
       <ol className="space-y-1">
-        {hits.map((hit, index) => (
-          <StoryRow key={hit.objectID} id={Number(hit.objectID)} rank={index + 1} />
+        {hits.map((hit) => (
+          <StoryRow key={hit.objectID} id={Number(hit.objectID)} />
         ))}
       </ol>
 
